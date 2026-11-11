@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <script>
+    // set language + direction before the first paint so the page doesn't flash
+    // order: ?lang=ar|en in the url, then the saved choice, then english
+    (function () {
+      let lang = 'en';
+      const fromUrl = new URLSearchParams(location.search).get('lang');
+      let saved = null;
+      try { saved = localStorage.getItem('nexgen-lang'); } catch (e) {}
+
+      if (fromUrl === 'ar' || fromUrl === 'en') lang = fromUrl;
+      else if (saved === 'ar') lang = 'ar';
+
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    })();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>NexGen Computers — Coming Soon</title>
+  <meta name="description" content="NexGen Computers is coming soon to Al-Khuwair, Muscat. Follow us for launch updates.">
+  <meta name="theme-color" content="#f6f5f3">
+  <meta property="og:title" content="NexGen Computers — Coming Soon">
+  <meta property="og:description" content="NexGen Computers is coming soon to Al-Khuwair, Muscat.">
+  <meta property="og:type" content="website">
+  <meta name="color-scheme" content="light">
+
+  <style>
+    :root {
+      --bg: #f6f5f3;
+      --card: #ffffff;
+      --ink: #424142;               /* brand charcoal */
+      --ink-dark: #2b2a2b;
+      --muted: #615f61;
+      --orange: #e4621a;            /* brand orange */
+      --orange-hover: #ef7330;
+      --orange-text: #a9440d;       /* darker orange so small text is readable */
+      --line: rgba(66, 65, 66, 0.12);
+      --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+      --gap: clamp(0.7rem, 2.4vh, 1.75rem);
+      --pad-y: clamp(1rem, 4vh, 3.5rem);
+      --pad-x: clamp(1rem, 4vw, 1.5rem);
+      --top-space: 3.4rem;          /* keeps content clear of the language switch */
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html { -webkit-text-size-adjust: 100%; }
+
+    /* big screens: bump the root font size, everything else is in rem so it scales */
+    @media (min-width: 1600px) and (min-height: 900px)  { html { font-size: 112.5%; } }
+    @media (min-width: 2200px) and (min-height: 1200px) { html { font-size: 137.5%; } }
+    @media (min-width: 3200px) and (min-height: 1800px) { html { font-size: 175%; } }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100svh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Inter", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* background */
+    .bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+      background: radial-gradient(120% 90% at 50% 0%, #fff 0%, var(--bg) 62%);
+    }
+
+    .grid {
+      position: absolute;
+      inset: -2px;
+      background-image:
+        linear-gradient(rgba(66, 65, 66, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(66, 65, 66, 0.07) 1px, transparent 1px);
+      background-size: 4rem 4rem;
+      -webkit-mask-image: radial-gradient(70% 60% at 50% 40%, #000 0%, transparent 75%);
+      mask-image: radial-gradient(70% 60% at 50% 40%, #000 0%, transparent 75%);
+    }
+
+    .orb {
+      position: absolute;
+      width: 70vmax;
+      height: 70vmax;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(228, 98, 26, 0.22) 0%, rgba(228, 98, 26, 0) 65%);
+      will-change: transform;
+    }
+    .orb1 {
+      top: -35vmax;
+      left: -25vmax;
+      animation: drift1 22s ease-in-out infinite alternate;
+    }
+    .orb2 {
+      bottom: -40vmax;
+      right: -30vmax;
+      background: radial-gradient(circle, rgba(239, 115, 48, 0.18) 0%, rgba(239, 115, 48, 0) 65%);
+      animation: drift2 26s ease-in-out infinite alternate;
+    }
+
+    .stripes {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(-35deg, rgba(66, 65, 66, 0.035) 0 1px, transparent 1px 38px);
+      -webkit-mask-image: radial-gradient(80% 70% at 50% 50%, #000, transparent 80%);
+      mask-image: radial-gradient(80% 70% at 50% 50%, #000, transparent 80%);
+    }
+
+    .sweep {
+      position: absolute;
+      top: -20%;
+      bottom: -20%;
+      left: -40%;
+      width: 28%;
+      background: linear-gradient(90deg, transparent, rgba(228, 98, 26, 0.11), transparent);
+      transform: skewX(-20deg);
+      animation: sweep 11s ease-in-out infinite;
+      will-change: transform;
+    }
+
+    .shape {
+      position: absolute;
+      border: 1px solid rgba(228, 98, 26, 0.32);
+      will-change: transform;
+    }
+    .shape1 {
+      width: 34vmin;
+      height: 34vmin;
+      top: 12%;
+      right: 8%;
+      transform: rotate(45deg);
+      animation: float1 16s ease-in-out infinite alternate;
+    }
+    .shape2 {
+      width: 20vmin;
+      height: 20vmin;
+      bottom: 14%;
+      left: 7%;
+      border-color: rgba(66, 65, 66, 0.16);
+      transform: rotate(45deg);
+      animation: float2 19s ease-in-out infinite alternate;
+    }
+
+    @keyframes drift1 { to { transform: translate3d(12vmax, 9vmax, 0) scale(1.1); } }
+    @keyframes drift2 { to { transform: translate3d(-10vmax, -8vmax, 0) scale(1.08); } }
+    @keyframes sweep {
+      0%, 15% { transform: translate3d(0, 0, 0) skewX(-20deg); opacity: 0; }
+      30%, 70% { opacity: 1; }
+      85%, 100% { transform: translate3d(520%, 0, 0) skewX(-20deg); opacity: 0; }
+    }
+    @keyframes float1 { to { transform: rotate(75deg) translate3d(0, 24px, 0); } }
+    @keyframes float2 { to { transform: rotate(15deg) translate3d(0, -20px, 0); } }
+
+    /* page layout */
+    main {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--gap);
+      padding: var(--pad-y) var(--pad-x);
+      padding-top: calc(max(var(--pad-y), var(--top-space)) + env(safe-area-inset-top, 0px));
+      padding-bottom: calc(var(--pad-y) + env(safe-area-inset-bottom, 0px));
+      padding-left: calc(var(--pad-x) + env(safe-area-inset-left, 0px));
+      padding-right: calc(var(--pad-x) + env(safe-area-inset-right, 0px));
+      text-align: center;
+      transition: opacity 0.16s ease;
+    }
+    main.switching { opacity: 0; }
+
+    /* just two stacks normally, they only become columns on short landscape screens */
+    .hero, .info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--gap);
+      width: 100%;
+      min-width: 0;
+    }
+
+    /* logo (inline svg so it can't fail to load) */
+    .logo-wrap {
+      width: min(88vw, 30rem, 62vh);
+      animation: logoIn 1.5s var(--ease) backwards;
+    }
+    .logo {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible;
+      filter: drop-shadow(0 12px 26px rgba(228, 98, 26, 0.2));
+      animation: logoGlow 2.6s 1.1s ease-in-out;
+    }
+    .logo .ink { fill: var(--ink); }
+    .logo .accent { fill: var(--orange); }
+
+    /* the 4 orange pieces of the X pop in one after another */
+    .logo .piece {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: pieceIn 0.9s var(--ease) both;
+    }
+    .logo .p1 { animation-delay: 0.9s; }
+    .logo .p2 { animation-delay: 1.0s; }
+    .logo .p3 { animation-delay: 1.1s; }
+    .logo .p4 { animation-delay: 1.2s; }
+
+    @keyframes logoIn {
+      from { opacity: 0; transform: scale(0.94); filter: blur(12px); }
+      to   { opacity: 1; transform: none; filter: none; }
+    }
+    @keyframes pieceIn {
+      from { opacity: 0; transform: scale(0.3); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    @keyframes logoGlow {
+      45% { filter: drop-shadow(0 0 30px rgba(228, 98, 26, 0.5)); }
+    }
+
+    /* fade up on load, --i in the html sets the order */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(18px);
+      animation: fadeUp 0.9s var(--ease) forwards;
+      animation-delay: calc(0.55s + var(--i, 0) * 0.12s);
+    }
+    @keyframes fadeUp { to { opacity: 1; transform: none; } }
+
+    /* text */
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin: 0;
+      padding: 0.4rem 0.95rem;
+      border: 1px solid rgba(228, 98, 26, 0.45);
+      border-radius: 999px;
+      background: rgba(228, 98, 26, 0.09);
+      color: var(--orange-text);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    .dot {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      background: var(--orange);
+      box-shadow: 0 0 0 0 rgba(228, 98, 26, 0.6);
+      animation: pulse 2s ease-out infinite;
+    }
+    @keyframes pulse { to { box-shadow: 0 0 0 12px rgba(228, 98, 26, 0); } }
+
+    h1 {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      column-gap: 0.25em;
+      margin: 0;
+      color: var(--ink);
+      font-size: clamp(2.1rem, min(11.5vw, 10vh), 5.5rem);
+      font-weight: 800;
+      line-height: 1.02;
+      letter-spacing: -0.02em;
+    }
+    h1 .accent { color: var(--orange); }
+
+    .lead {
+      margin: 0;
+      max-width: 34rem;
+      color: var(--muted);
+      font-size: clamp(0.95rem, min(2.6vw, 2.6vh), 1.2rem);
+    }
+
+    /* countdown (stays hidden until a launch date is set in the script) */
+    .countdown {
+      display: flex;
+      gap: clamp(0.5rem, 2vw, 0.9rem);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .countdown[hidden] { display: none; }
+    .countdown li {
+      min-width: clamp(4.2rem, 17vw, 5.6rem);
+      padding: 0.8rem 0.5rem;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--card);
+      box-shadow: 0 10px 30px -18px rgba(66, 65, 66, 0.4);
+    }
+    .countdown strong {
+      display: block;
+      color: var(--ink);
+      font-size: clamp(1.5rem, 6vw, 2.2rem);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+    }
+    .countdown span {
+      font-size: 0.7rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* buttons */
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      min-height: 3rem;
+      padding: 0.7rem 1.4rem;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      font: inherit;
+      font-weight: 650;
+      white-space: nowrap;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.25s var(--ease), background-color 0.25s, border-color 0.25s, box-shadow 0.25s;
+    }
+    .btn svg { width: 1.25rem; height: 1.25rem; flex: none; }
+
+    .btn-main {
+      background: var(--orange);
+      color: #1c1b1c;
+      box-shadow: 0 12px 28px -12px rgba(228, 98, 26, 0.75);
+    }
+    .btn-main:hover { background: var(--orange-hover); transform: translateY(-2px); }
+
+    .btn-ghost {
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.7);
+      border-color: rgba(66, 65, 66, 0.3);
+    }
+    .btn-ghost:hover {
+      border-color: var(--orange);
+      background: rgba(228, 98, 26, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .btn:active { transform: translateY(0); }
+    .btn:focus-visible {
+      outline: 3px solid var(--ink-dark);
+      outline-offset: 3px;
+    }
+
+    /* location card */
+    .location {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      width: min(100%, 40rem);
+      padding: 1.1rem 1.25rem;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--card);
+      box-shadow: 0 24px 50px -28px rgba(66, 65, 66, 0.45);
+      text-align: start;
+    }
+    .loc-icon {
+      flex: none;
+      display: grid;
+      place-items: center;
+      width: 3rem;
+      height: 3rem;
+      border-radius: 0.9rem;
+      background: rgba(228, 98, 26, 0.12);
+      color: var(--orange);
+    }
+    .loc-icon svg { width: 1.5rem; height: 1.5rem; }
+    .loc-text { flex: 1; min-width: 0; }
+    .loc-label {
+      margin: 0;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--orange-text);
+    }
+    .loc-city { margin: 0.1rem 0 0; font-size: 1.25rem; font-weight: 700; color: var(--ink); }
+    .loc-address { margin: 0.2rem 0 0; font-size: 0.88rem; font-style: normal; color: var(--muted); }
+
+    /* language switch */
+    .lang {
+      position: fixed;          /* same corner in english and arabic */
+      z-index: 5;
+      top: calc(0.6rem + env(safe-area-inset-top, 0px));
+      right: calc(var(--pad-x) + env(safe-area-inset-right, 0px));
+      display: inline-flex;
+      direction: ltr;           /* always reads "English | العربية" */
+      padding: 0.15rem;
+      border: 1px solid rgba(66, 65, 66, 0.22);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.88);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 24px -14px rgba(66, 65, 66, 0.55);
+    }
+    .lang button {
+      min-width: 3.6rem;
+      min-height: 2.2rem;
+      padding: 0 0.85rem;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--ink);
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 700;
+      line-height: 1.2;
+      cursor: pointer;
+      transition: background-color 0.25s, color 0.25s;
+    }
+    /* each button keeps its own font so the switch doesn't change size between languages */
+    .lang button[lang="en"] { font-family: "Inter", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif; }
+    .lang button[lang="ar"] { font-family: "Segoe UI", Tahoma, "Noto Sans Arabic", "Geeza Pro", Arial, sans-serif; }
+    .lang button:hover { background: rgba(228, 98, 26, 0.12); }
+    .lang button[aria-pressed="true"] { background: var(--orange); color: #1c1b1c; }
+    .lang button:focus-visible { outline: 3px solid var(--ink-dark); outline-offset: 2px; }
+
+    /* arabic / rtl */
+    html[lang="ar"] body {
+      font-family: "Cairo", "Segoe UI", Tahoma, "Noto Sans Arabic", "Helvetica Neue", Arial, system-ui, sans-serif;
+      line-height: 1.7;
+    }
+    /* letter-spacing and uppercase break the joined arabic letters, so turn them off */
+    html[lang="ar"] .pill,
+    html[lang="ar"] .loc-label,
+    html[lang="ar"] .countdown span {
+      letter-spacing: 0;
+      text-transform: none;
+    }
+    html[lang="ar"] .pill { font-size: 0.92rem; }
+    html[lang="ar"] .loc-label { font-size: 0.88rem; }
+    html[lang="ar"] .countdown span { font-size: 0.82rem; }
+    html[lang="ar"] .btn { font-size: 1.02rem; }
+    /* the arabic heading is one short word, so it can be bigger (and needs more line height) */
+    html[lang="ar"] h1 {
+      letter-spacing: 0;
+      line-height: 1.3;
+      font-size: clamp(2.8rem, min(15vw, 11vh), 6.5rem);
+    }
+
+    /* responsive */
+    @media (max-width: 560px) {
+      .actions { width: 100%; flex-direction: column; gap: 0.6rem; }
+      .actions .btn { width: 100%; }
+      .location { display: grid; grid-template-columns: auto 1fr; gap: 0.85rem 1rem; padding: 1rem; }
+      .location .btn { grid-column: 1 / -1; width: 100%; }
+      .countdown { width: 100%; max-width: 22rem; }
+      .countdown li { min-width: 0; flex: 1; }
+    }
+
+    /* short screens: tighter spacing, and a slightly smaller arabic heading so it all still fits */
+    @media (max-height: 700px) {
+      :root { --gap: 0.6rem; --pad-y: 0.8rem; }
+      html[lang="ar"] body { line-height: 1.5; }
+      html[lang="ar"] h1 { font-size: clamp(2.3rem, min(13vw, 9.5vh), 5rem); line-height: 1.2; }
+    }
+
+    /* tiny phones: let the button text shrink with the width so it stays on one line */
+    @media (max-width: 360px) {
+      .btn { padding-inline: 0.9rem; gap: 0.5rem; font-size: clamp(0.78rem, 4.3vw, 0.95rem); }
+      .loc-city { font-size: 1.1rem; }
+    }
+
+    /* short + wide (phone in landscape): two columns instead of one tall stack */
+    @media (orientation: landscape) and (max-height: 540px) {
+      :root { --gap: 0.65rem; --pad-y: 0.75rem; }
+      main {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        align-content: center;
+        align-items: center;
+        column-gap: clamp(1.25rem, 4vw, 3rem);
+        width: 100%;
+        max-width: 64rem;
+        margin-inline: auto;
+      }
+      .logo-wrap { width: min(100%, 24rem, 70vh); }
+      h1 { font-size: clamp(1.6rem, min(13vh, 5.8vw), 3.8rem); }
+      html[lang="ar"] h1 { font-size: clamp(2rem, min(15vh, 9vw), 4.4rem); }
+      .lead { font-size: 0.9rem; max-width: 26rem; }
+      .btn { min-height: 2.75rem; font-size: clamp(0.82rem, 1.9vw, 1rem); }
+      .actions { width: 100%; flex-direction: column; gap: 0.5rem; }
+      .actions .btn { width: 100%; }
+      .location { display: grid; grid-template-columns: auto 1fr; gap: 0.7rem 1rem; padding: 0.9rem 1rem; }
+      .location .btn { grid-column: 1 / -1; width: 100%; }
+    }
+
+    /* ...and if it's really short too, hide the pin icon to save height */
+    @media (orientation: landscape) and (max-height: 400px) {
+      :root { --pad-y: 0.5rem; }
+      .location { grid-template-columns: 1fr; padding: 0.7rem 0.9rem; gap: 0.5rem; }
+      .loc-icon, .loc-label { display: none; }
+      .loc-city { font-size: 1.05rem; }
+      .loc-address { font-size: 0.78rem; }
+      .btn { min-height: 2.5rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+      .fade-up { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg" aria-hidden="true">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="grid"></div>
+    <div class="stripes"></div>
+    <div class="shape shape1"></div>
+    <div class="shape shape2"></div>
+    <div class="sweep"></div>
+  </div>
+
+  <div class="lang" role="group" aria-label="Language / اللغة">
+    <button type="button" data-lang="en" lang="en" aria-pressed="true">English</button>
+    <button type="button" data-lang="ar" lang="ar" aria-pressed="false">العربية</button>
+  </div>
+
+  <main>
+    <div class="hero">
+      <div class="logo-wrap">
+      <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="19.7 328.8 572.6 141.4" role="img" aria-labelledby="logo-title">
+        <title id="logo-title">NexGen Computers</title>
+        <defs>
+<g>
+<g id="glyph-0-0">
+<path d="M 31.984375 0 L 31.984375 -19.3125 C 31.984375 -34.5 31.984375 -51.3125 31.109375 -59.34375 L 31.484375 -59.34375 C 35.5 -48.046875 51.1875 -15.5625 58.46875 0 L 87.3125 0 L 87.3125 -86.3125 L 64.359375 -86.3125 L 64.359375 -68 C 64.359375 -54.203125 64.484375 -38.890625 65.484375 -29.984375 L 65.109375 -29.984375 C 61.46875 -40.640625 48.296875 -66.859375 39.140625 -86.3125 L 8.90625 -86.3125 L 8.90625 0 Z M 31.984375 0 "/>
+</g>
+<g id="glyph-0-1">
+<path d="M 72.640625 -53.6875 L 33.25 -53.6875 L 33.25 -67.625 L 74.265625 -67.625 L 74.265625 -86.3125 L 8.90625 -86.3125 L 8.90625 0 L 74.390625 0 L 77.15625 -18.6875 L 33.25 -18.6875 L 33.25 -34.875 L 72.640625 -34.875 Z M 72.640625 -53.6875 "/>
+</g>
+<g id="glyph-0-2">
+<path d="M 88.703125 -49.546875 L 48.296875 -49.546875 L 48.296875 -31.734375 L 64.234375 -31.734375 L 64.234375 -31.234375 C 64.234375 -25.46875 61.96875 -16.1875 49.171875 -16.1875 C 35.25 -16.1875 31.109375 -29.359375 31.109375 -43.03125 C 31.109375 -56.828125 34.625 -70.125 49.046875 -70.125 C 59.34375 -70.125 62.59375 -64.359375 63.859375 -59.71875 L 88.828125 -59.71875 C 87.3125 -73.015625 75.265625 -87.9375 49.171875 -87.9375 C 20.453125 -87.9375 5.015625 -68.625 5.015625 -42.15625 C 5.015625 -18.1875 18.3125 1.875 44.78125 1.875 C 56.828125 1.875 65.234375 -1.375 70.125 -7.78125 C 70.375 -5.765625 71 -2.265625 71.640625 0 L 88.703125 0 C 88.703125 0 88.703125 -49.546875 88.703125 -49.546875 Z M 88.703125 -49.546875 "/>
+</g>
+<g id="glyph-1-0">
+<path d="M 21.625 -7.140625 C 20.40625 -4.5 18.640625 -2.703125 14.421875 -2.703125 C 9.03125 -2.703125 6.03125 -6.875 6.03125 -12.078125 C 6.03125 -17.328125 9.109375 -21.25 14.390625 -21.25 C 18.953125 -21.25 20.71875 -18.953125 21.625 -16.71875 L 25.6875 -16.71875 C 24.8125 -20.671875 21.453125 -24.5 14.421875 -24.5 C 6.5625 -24.5 1.828125 -18.75 1.828125 -11.953125 C 1.828125 -5.140625 6.09375 0.5 14.21875 0.5 C 21.21875 0.5 24.296875 -3.015625 25.625 -7.140625 Z M 21.625 -7.140625 "/>
+</g>
+<g id="glyph-1-1">
+<path d="M 14.546875 -24.5 C 6.765625 -24.5 1.828125 -18.71875 1.828125 -12.046875 C 1.828125 -5.046875 6.59375 0.5 14.421875 0.5 C 22.640625 0.5 27.171875 -5.3125 27.171875 -12.046875 C 27.171875 -18.6875 22.40625 -24.5 14.546875 -24.5 Z M 14.390625 -21.25 C 20.109375 -21.25 22.984375 -16.78125 22.984375 -11.984375 C 22.984375 -7.078125 20.203125 -2.703125 14.59375 -2.703125 C 8.96875 -2.703125 6.03125 -7.140625 6.03125 -12.15625 C 6.03125 -16.953125 9 -21.25 14.390625 -21.25 Z M 14.390625 -21.25 "/>
+</g>
+<g id="glyph-1-2">
+<path d="M 26.03125 0 L 29.890625 0 L 29.890625 -24 L 24.125 -24 C 21.25 -16.6875 17.59375 -7.890625 16.484375 -4.703125 L 16.453125 -4.703125 C 15.734375 -7.171875 12.078125 -16.21875 9 -24 L 3.3125 -24 L 3.3125 0 L 6.9375 0 L 6.9375 -9.46875 C 6.9375 -13.53125 6.796875 -18.515625 6.59375 -21.28125 L 6.640625 -21.28125 C 7.921875 -17.296875 12.015625 -6.9375 14.484375 0 L 17.96875 0 C 21.25 -8.359375 24.9375 -17.5 26.125 -21.28125 L 26.15625 -21.28125 C 26.03125 -18.78125 26.03125 -14.453125 26.03125 -10.046875 Z M 26.03125 0 "/>
+</g>
+<g id="glyph-1-3">
+<path d="M 3.3125 0 L 7.28125 0 L 7.28125 -9.34375 L 14.921875 -9.34375 C 20.375 -9.34375 23.65625 -12.046875 23.65625 -16.828125 C 23.65625 -20.953125 20.71875 -24 14.859375 -24 L 3.3125 -24 Z M 7.28125 -12.59375 L 7.28125 -20.75 L 14.453125 -20.75 C 17.96875 -20.75 19.65625 -19.296875 19.65625 -16.75 C 19.65625 -13.53125 17.53125 -12.59375 14.453125 -12.59375 Z M 7.28125 -12.59375 "/>
+</g>
+<g id="glyph-1-4">
+<path d="M 3.078125 -24 L 3.078125 -10.125 C 3.078125 -2.640625 7.28125 0.5 13.84375 0.5 C 20.46875 0.5 24.578125 -2.671875 24.578125 -10.359375 L 24.578125 -24 L 20.578125 -24 L 20.578125 -10.359375 C 20.578125 -4.640625 18.078125 -2.703125 13.984375 -2.703125 C 10.484375 -2.703125 7.046875 -4.359375 7.046875 -10.359375 L 7.046875 -24 Z M 3.078125 -24 "/>
+</g>
+<g id="glyph-1-5">
+<path d="M 9.265625 0 L 13.265625 0 L 13.265625 -20.671875 L 22.234375 -20.671875 L 22.234375 -24 L 0.296875 -24 L 0.296875 -20.671875 L 9.265625 -20.671875 Z M 9.265625 0 "/>
+</g>
+<g id="glyph-1-6">
+<path d="M 21.421875 -14.1875 L 7.28125 -14.1875 L 7.28125 -20.671875 L 22.171875 -20.671875 L 22.171875 -24 L 3.3125 -24 L 3.3125 0 L 22.40625 0 L 22.90625 -3.28125 L 7.28125 -3.28125 L 7.28125 -10.890625 L 21.421875 -10.890625 Z M 21.421875 -14.1875 "/>
+</g>
+<g id="glyph-1-7">
+<path d="M 13.4375 -10.046875 C 17.5 -10.046875 18.75 -8.96875 18.75 -5.6875 L 18.75 -4.90625 C 18.75 -2.78125 18.71875 -1.046875 19.09375 0 L 23.15625 0 C 22.84375 -1.015625 22.84375 -3.015625 22.84375 -4.8125 L 22.84375 -5.890625 C 22.84375 -10.125 20.578125 -11.234375 19.15625 -11.671875 C 21.96875 -12.453125 23.484375 -14.453125 23.484375 -17.390625 C 23.484375 -21.625 20.234375 -24 15.15625 -24 L 3.3125 -24 L 3.3125 0 L 7.25 0 L 7.25 -10.046875 Z M 7.25 -20.8125 L 14.3125 -20.8125 C 17.703125 -20.8125 19.421875 -19.5625 19.421875 -17.125 C 19.421875 -14.453125 17.734375 -13.234375 14.21875 -13.234375 L 7.25 -13.234375 Z M 7.25 -20.8125 "/>
+</g>
+<g id="glyph-1-8">
+<path d="M 1.25 -7 C 2.03125 -2.609375 5.421875 0.5 12.3125 0.5 C 19.734375 0.5 22.8125 -2.78125 22.8125 -6.703125 C 22.8125 -10.046875 21.421875 -12.765625 12.65625 -14.25 C 7.40625 -15.15625 6.4375 -16.25 6.4375 -18.078125 C 6.4375 -20.265625 8.46875 -21.390625 11.78125 -21.390625 C 16.546875 -21.390625 17.53125 -19.359375 17.96875 -17.828125 L 22 -17.828125 C 21.734375 -20.34375 19.765625 -24.46875 11.875 -24.46875 C 6.53125 -24.46875 2.40625 -22.0625 2.40625 -17.703125 C 2.40625 -14.453125 4.0625 -12.078125 11.546875 -10.796875 C 17.46875 -9.8125 18.75 -8.46875 18.75 -6.296875 C 18.75 -4.203125 17.09375 -2.53125 12.625 -2.53125 C 8.0625 -2.53125 6.09375 -4.359375 5.28125 -7 Z M 1.25 -7 "/>
+</g>
+</g>
+</defs>
+        <path class="accent piece p1" d="M 263.703125 360.808594 L 264.113281 360.808594 L 278.484375 333.207031 C 273.257812 331.375 267.644531 330.367188 261.792969 330.367188 C 257.417969 330.367188 253.175781 330.921875 249.132812 331.96875 Z M 263.703125 360.808594 "/>
+<path class="accent piece p2" d="M 280.949219 377.476562 L 301.761719 411.550781 C 308.320312 403.039062 312.230469 392.378906 312.230469 380.804688 C 312.230469 368.230469 307.617188 356.742188 300.011719 347.910156 Z M 280.949219 377.476562 "/>
+<path class="accent piece p3" d="M 262.246094 398.210938 L 261.941406 398.210938 L 245.902344 428.671875 C 250.898438 430.332031 256.238281 431.242188 261.792969 431.242188 C 267.441406 431.242188 272.867188 430.296875 277.9375 428.585938 Z M 262.246094 398.210938 "/>
+<path class="accent piece p4" d="M 244.238281 380.539062 L 224.078125 347.328125 C 216.167969 356.234375 211.351562 367.953125 211.351562 380.804688 C 211.351562 393.363281 215.953125 404.839844 223.550781 413.667969 Z M 244.238281 380.539062 "/>
+<g class="ink">
+<use xlink:href="#glyph-0-0" x="29.5264" y="423.4482"/>
+<use xlink:href="#glyph-0-1" x="125.876608" y="423.4482"/>
+</g>
+<g class="ink">
+<use xlink:href="#glyph-0-2" x="323.09344" y="423.4482"/>
+</g>
+<g class="ink">
+<use xlink:href="#glyph-0-1" x="419.318192" y="423.4482"/>
+<use xlink:href="#glyph-0-0" x="499.108208" y="423.4482"/>
+</g>
+<g class="accent">
+<use xlink:href="#glyph-1-0" x="318.3857" y="464.8672"/>
+</g>
+<g class="accent">
+<use xlink:href="#glyph-1-1" x="345.599331" y="464.8672"/>
+</g>
+<g class="accent">
+<use xlink:href="#glyph-1-2" x="374.708439" y="464.8672"/>
+<use xlink:href="#glyph-1-3" x="408.116218" y="464.8672"/>
+</g>
+<g class="accent">
+<use xlink:href="#glyph-1-4" x="433.332829" y="464.8672"/>
+</g>
+<g class="accent">
+<use xlink:href="#glyph-1-5" x="461.561894" y="464.8672"/>
+</g>
+<g class="accent">
+<use xlink:href="#glyph-1-6" x="484.409159" y="464.8672"/>
+</g>
+<g class="accent">
+<use xlink:href="#glyph-1-7" x="508.843886" y="464.8672"/>
+<use xlink:href="#glyph-1-8" x="534.635909" y="464.8672"/>
+</g>
+<path class="ink" d="M 559.460938 437.820312 C 559.800781 437.984375 572.125 437.40625 572.210938 437.820312 C 572.296875 438.238281 585.46875 453.097656 585.46875 453.097656 L 571.957031 468.632812 L 559.460938 468.632812 L 573.140625 453.605469 Z M 559.460938 437.820312 "/>
+<path class="ink" d="M 575.261719 437.851562 C 575.433594 437.851562 577.0625 437.796875 577.234375 437.851562 C 577.402344 437.910156 590.742188 452.996094 590.742188 452.996094 L 577.457031 468.472656 L 575.261719 468.472656 L 588.773438 453.152344 Z M 575.261719 437.851562 "/>
+<path class="ink" d="M 315.125 452.734375 L 21.257812 452.734375 L 21.257812 456.386719 L 315.125 456.386719 Z M 315.125 452.734375 "/>
+      </svg>
+      </div>
+
+      <p class="pill fade-up" style="--i:0">
+        <span class="dot" aria-hidden="true"></span>
+        <span data-text="pill">Launching soon</span>
+      </p>
+
+      <h1 class="fade-up" style="--i:1">
+        <span data-text="coming">Coming</span> <span class="accent" data-text="soon">Soon</span>
+      </h1>
+
+      <p class="lead fade-up" style="--i:2" data-text="lead">Something powerful is on its way. We’re opening our doors in Muscat, so stay tuned.</p>
+
+      <!-- hidden until LAUNCH_DATE is set in the script at the bottom -->
+      <ul class="countdown fade-up" id="countdown" role="timer" aria-label="Time until launch" data-label="aCountdown" style="--i:3" hidden>
+        <li><strong id="cd-days">00</strong><span data-text="days">Days</span></li>
+        <li><strong id="cd-hours">00</strong><span data-text="hours">Hours</span></li>
+        <li><strong id="cd-mins">00</strong><span data-text="mins">Mins</span></li>
+        <li><strong id="cd-secs">00</strong><span data-text="secs">Secs</span></li>
+      </ul>
+    </div>
+
+    <div class="info">
+      <div class="actions fade-up" style="--i:4">
+        <a class="btn btn-main" href="https://wa.me/96877217816" target="_blank" rel="noopener noreferrer"
+           aria-label="Chat with NexGen Computers on WhatsApp, +968 7721 7816 (opens in a new tab)" data-label="aWhatsapp">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          <span><span data-text="whatsapp">WhatsApp</span> <bdi dir="ltr">+968 7721 7816</bdi></span>
+        </a>
+        <a class="btn btn-ghost" href="https://www.instagram.com/nexgencomputersoman/" target="_blank" rel="noopener noreferrer"
+           aria-label="NexGen Computers on Instagram, @nexgencomputersoman (opens in a new tab)" data-label="aInstagram">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          <span data-text="instagram">Instagram</span>
+        </a>
+      </div>
+
+      <section class="location fade-up" style="--i:5" aria-labelledby="loc-title">
+        <div class="loc-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div class="loc-text">
+          <p class="loc-label" id="loc-title" data-text="visit">Visit us</p>
+          <p class="loc-city" data-text="city">Al-Khuwair, Muscat</p>
+          <address class="loc-address" data-text="address">NexGen computer store, HCRG+XWF, Dohat Aladab, Al Khuwair St, Muscat</address>
+        </div>
+        <a class="btn btn-main" href="https://maps.app.goo.gl/nEH4Gh6AozxS3BY47" target="_blank" rel="noopener noreferrer"
+           aria-label="Get directions to NexGen Computers in Google Maps (opens in a new tab)" data-label="aDirections">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+          <span data-text="directions">Get Directions</span>
+        </a>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // wraps latin words so they don't get flipped around inside arabic text
+    const ltr = (str) => '\u2066' + str + '\u2069';
+
+    // all the visible text lives here. en/ar keys match data-text / data-label in the html
+    const text = {
+      en: {
+        title: 'NexGen Computers — Coming Soon',
+        desc: 'NexGen Computers is coming soon to Al-Khuwair, Muscat. Follow us for launch updates.',
+        pill: 'Launching soon',
+        coming: 'Coming',
+        soon: 'Soon',
+        lead: 'Something powerful is on its way. We’re opening our doors in Muscat, so stay tuned.',
+        whatsapp: 'WhatsApp',
+        instagram: 'Instagram',
+        visit: 'Visit us',
+        city: 'Al-Khuwair, Muscat',
+        address: 'NexGen computer store, HCRG+XWF, Dohat Aladab, Al Khuwair St, Muscat',
+        directions: 'Get Directions',
+        days: 'Days',
+        hours: 'Hours',
+        mins: 'Mins',
+        secs: 'Secs',
+        aCountdown: 'Time until launch',
+        aWhatsapp: 'Chat with NexGen Computers on WhatsApp, +968 7721 7816 (opens in a new tab)',
+        aInstagram: 'NexGen Computers on Instagram, @nexgencomputersoman (opens in a new tab)',
+        aDirections: 'Get directions to NexGen Computers in Google Maps (opens in a new tab)'
+      },
+      ar: {
+        title: 'NexGen Computers — قريبًا',
+        desc: 'ستفتح NexGen Computers أبوابها قريبًا في الخوير، مسقط. تابعونا للاطلاع على آخر المستجدات.',
+        pill: 'الإطلاق قريبًا',
+        coming: '',   // arabic only needs one word, so this one is hidden
+        soon: 'قريبًا',
+        lead: 'شيء قوي في طريقه إليكم. نفتح أبوابنا في مسقط قريبًا، فتابعونا.',
+        whatsapp: 'واتساب',
+        instagram: 'إنستغرام',
+        visit: 'زورونا',
+        city: 'الخوير، مسقط',
+        address: 'متجر ' + ltr('NexGen') + ' للكمبيوتر، ' + ltr('HCRG+XWF') + '، دوحة الأدب، شارع الخوير، مسقط',
+        directions: 'احصل على الاتجاهات',
+        days: 'أيام',
+        hours: 'ساعات',
+        mins: 'دقائق',
+        secs: 'ثوانٍ',
+        aCountdown: 'الوقت المتبقي للإطلاق',
+        aWhatsapp: 'تحدّث مع ' + ltr('NexGen Computers') + ' عبر واتساب على الرقم ' + ltr('+968 7721 7816') + ' (يفتح في تبويب جديد)',
+        aInstagram: 'تابع ' + ltr('NexGen Computers') + ' على إنستغرام، ' + ltr('@nexgencomputersoman') + ' (يفتح في تبويب جديد)',
+        aDirections: 'احصل على الاتجاهات إلى ' + ltr('NexGen Computers') + ' في خرائط جوجل (يفتح في تبويب جديد)'
+      }
+    };
+
+    const root = document.documentElement;
+    const main = document.querySelector('main');
+    const langButtons = document.querySelectorAll('.lang button');
+
+    let currentLang = root.lang === 'ar' ? 'ar' : 'en';
+    let arabicFontLoaded = false;
+
+    // Cairo is the same arabic font as the main NexGen site. only download it if arabic is actually shown
+    function loadArabicFont() {
+      if (arabicFontLoaded) return;
+      arabicFontLoaded = true;
+
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800&display=swap';
+      document.head.appendChild(link);
+    }
+
+    function setMeta(selector, value) {
+      const el = document.querySelector(selector);
+      if (el) el.setAttribute('content', value);
+    }
+
+    function applyLang(lang, save) {
+      const t = text[lang];
+      currentLang = lang;
+      root.lang = lang;
+      root.dir = lang === 'ar' ? 'rtl' : 'ltr';
+      if (lang === 'ar') loadArabicFont();
+
+      document.querySelectorAll('[data-text]').forEach((el) => {
+        const value = t[el.dataset.text];
+        el.textContent = value;
+        el.hidden = value === '';
+      });
+      document.querySelectorAll('[data-label]').forEach((el) => {
+        el.setAttribute('aria-label', t[el.dataset.label]);
+      });
+
+      document.title = t.title;
+      setMeta('meta[name="description"]', t.desc);
+      setMeta('meta[property="og:title"]', t.title);
+      setMeta('meta[property="og:description"]', t.desc);
+
+      langButtons.forEach((btn) => {
+        btn.setAttribute('aria-pressed', String(btn.dataset.lang === lang));
+      });
+
+      if (save) {
+        try { localStorage.setItem('nexgen-lang', lang); } catch (e) {}
+      }
+    }
+
+    function switchLang(lang) {
+      if (lang === currentLang) return;
+
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduceMotion || !main) {
+        applyLang(lang, true);
+        return;
+      }
+
+      // quick fade out, swap the text, fade back in
+      main.classList.add('switching');
+      setTimeout(() => {
+        applyLang(lang, true);
+        requestAnimationFrame(() => main.classList.remove('switching'));
+      }, 160);
+    }
+
+    langButtons.forEach((btn) => {
+      btn.addEventListener('click', () => switchLang(btn.dataset.lang));
+    });
+
+    // the script in <head> already set lang + dir, this just fills in the text
+    applyLang(currentLang, false);
+
+
+    // ---- countdown ----
+    // leave LAUNCH_DATE as null to keep it hidden.
+    // to turn it on use a date with timezone, e.g. '2026-12-01T09:00:00+04:00' (Oman is UTC+4)
+    const LAUNCH_DATE = null;
+
+    function startCountdown() {
+      if (!LAUNCH_DATE) return;
+
+      const target = new Date(LAUNCH_DATE).getTime();
+      if (Number.isNaN(target) || target <= Date.now()) return;
+
+      const box = document.getElementById('countdown');
+      const daysEl = document.getElementById('cd-days');
+      const hoursEl = document.getElementById('cd-hours');
+      const minsEl = document.getElementById('cd-mins');
+      const secsEl = document.getElementById('cd-secs');
+      const pad = (n) => String(n).padStart(2, '0');
+      let timer;
+
+      function tick() {
+        const diff = Math.max(0, target - Date.now());
+        const total = Math.floor(diff / 1000);
+
+        daysEl.textContent = pad(Math.floor(total / 86400));
+        hoursEl.textContent = pad(Math.floor((total % 86400) / 3600));
+        minsEl.textContent = pad(Math.floor((total % 3600) / 60));
+        secsEl.textContent = pad(total % 60);
+
+        if (diff === 0) clearInterval(timer);
+      }
+
+      box.hidden = false;
+      tick();
+      timer = setInterval(tick, 1000);
+    }
+
+    startCountdown();
+  </script>
+</body>
+</html>
